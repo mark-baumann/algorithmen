@@ -209,3 +209,43 @@ class TestDP:
     def test_lcs_empty(self):
         assert longest_common_subsequence("", "ABC") == 0
         assert longest_common_subsequence("ABC", "") == 0
+
+    def test_lcs_substring(self):
+        assert longest_common_subsequence("ABCDEF", "BCD") == 3
+
+    def test_lcs_repeated(self):
+        assert longest_common_subsequence("AAAA", "AA") == 2
+
+
+# ═══════════════════════════════════════════════════════════════
+# Edge Cases & Robustheit
+# ═══════════════════════════════════════════════════════════════
+
+class TestEdgeCases:
+    def test_binary_search_duplicates(self):
+        # Bei Duplikaten: irgendein gültiger Index
+        idx = binary_search([1, 2, 2, 2, 3], 2)
+        assert idx in (1, 2, 3)
+
+    def test_bfs_disconnected_graph(self):
+        graph = {"A": ["B"], "B": ["A"], "C": ["D"], "D": ["C"]}
+        result = bfs(graph, "A")
+        assert set(result) == {"A", "B"}
+
+    def test_dfs_disconnected_graph(self):
+        graph = {"A": ["B"], "B": ["A"], "C": ["D"], "D": ["C"]}
+        result = dfs(graph, "A")
+        assert set(result) == {"A", "B"}
+
+    def test_fibonacci_negative(self):
+        assert fibonacci(-1) == -1
+
+    def test_knapsack_exact_fit(self):
+        assert knapsack([10, 20], [5, 10], 15) == 30
+
+    def test_large_input_performance(self):
+        # Sicherstellen, dass große Eingaben nicht crashen
+        arr = list(range(1000, 0, -1))
+        result = merge_sort(arr)
+        assert result == sorted(arr)
+        assert binary_search(result, 500) >= 0

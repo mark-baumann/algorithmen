@@ -5,7 +5,7 @@ Sortieren, Suchen, Graphen, Dynamische Programmierung —
 implementiert zum Verstehen, nicht zum Produktiv-Einsatz.
 """
 
-from typing import List, TypeVar, Optional
+from typing import List, TypeVar, Optional, Dict
 from collections import deque
 import heapq
 
@@ -89,7 +89,7 @@ def binary_search(arr: List[T], target: T) -> int:
 # Graphenalgorithmen
 # ═══════════════════════════════════════════════════════════════
 
-def bfs(graph: dict, start: T) -> List[T]:
+def bfs(graph: Dict[T, List[T]], start: T) -> List[T]:
     """Breitensuche — kürzester Pfad in ungewichtetem Graphen."""
     visited = {start}
     queue = deque([start])
@@ -104,7 +104,7 @@ def bfs(graph: dict, start: T) -> List[T]:
     return order
 
 
-def dfs(graph: dict, start: T, visited: set = None) -> List[T]:
+def dfs(graph: Dict[T, List[T]], start: T, visited: Optional[set] = None) -> List[T]:
     """Tiefensuche — rekursiv."""
     if visited is None:
         visited = set()
