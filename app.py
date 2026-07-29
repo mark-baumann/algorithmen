@@ -1,542 +1,569 @@
 """
-Streamlit-App: Algorithmen-Visualisierung
-========================================
+Streamlit-App: Algorithmen
+==========================
 Sortieralgorithmen animieren, Suchalgorithmen vergleichen, Graphen visualisieren.
 """
 
 import streamlit as st
-import matplotlib.pyplot as plt
 import numpy as np
 import time
-import sys
-from pathlib import Path
+import random
+from collections import deque
+import heapq
+from typing import List, Dict, Tuple
 
-# Repo-Pfad zum Importieren der Algorithmen
-sys.path.insert(0, str(Path(__file__).parent))
-from algorithms import (
-    bubble_sort, quick_sort, merge_sort,
-    binary_search, bfs, dfs, dijkstra,
-    fibonacci, knapsack, longest_common_subsequence,
-)
-
+# ── Page Config ──────────────────────────────────────────────
 st.set_page_config(
-    page_title="Algorithmen-Visualisierung",
-    page_icon="🔬",
+    page_title="Algorithmen Visualisierung",
+    page_icon="📊",
     layout="wide",
 )
 
-st.title("🔬 Algorithmen-Visualisierung")
-st.markdown("### Sortieren · Suchen · Graphen · Dynamische Programmierung")
+st.title("📊 Algorithmen Visualisierung")
+st.markdown("Sortieren · Suchen · Graphen · Dynamische Programmierung")
 
-# ── Sidebar: Navigation ──
-kategorie = st.sidebar.radio(
-    "📂 Kategorie wählen",
-    ["Sortieralgorithmen", "Suchalgorithmen", "Graphen", "Dynamische Programmierung"],
+# ── Sidebar: Modus ───────────────────────────────────────────
+mode = st.sidebar.selectbox(
+    "Modus wählen",
+    ["Sortieralgorithmen animieren", "Suchalgorithmen vergleichen", "Graphen visualisieren"],
 )
 
 # ═══════════════════════════════════════════════════════════════
-# SORTIERALGORITHMEN
+# 1. Sortieralgorithmen animieren
 # ═══════════════════════════════════════════════════════════════
-if kategorie == "Sortieralgorithmen":
-    st.header("📊 Sortieralgorithmen animieren")
 
-    col1, col2 = st.columns([1, 2])
+if mode == "Sortieralgorithmen animieren":
+    st.header("🔄 Sortieralgorithmen animieren")
 
+    col1, col2 = st.columns(2)
     with col1:
-        algo = st.selectbox(
+        algorithm = st.selectbox(
             "Algorithmus",
-            ["Bubble Sort", "Quick Sort", "Merge Sort"],
+            ["Bubble Sort", "Quick Sort", "Merge Sort", "Alle drei vergleichen"],
         )
-        n_elements = st.slider("Anzahl Elemente", 5, 50, 20)
-        geschwindigkeit = st.slider("Geschwindigkeit (ms)", 10, 500, 100)
-        seed = st.number_input("Zufalls-Seed", 0, 9999, 42)
-
-        if st.button("▶️ Sortierung starten", use_container_width=True):
-            st.session_state.sort_running = True
-            st.session_state.sort_step = 0
-
     with col2:
-        if "sort_running" not in st.session_state:
-            st.session_state.sort_running = False
+        array_size = st.slider("Array-Größe", 5, 50, 20)
+        speed = st.slider("Geschwindigkeit (ms)", 10, 500, 100, 10)
 
-        # Array generieren
-        rng = np.random.RandomState(seed)
-        arr = rng.randint(1, 100, n_elements).tolist()
+    if st.button("🔄 Neues Array generieren", use_container_width=True):
+        st.session_state.sort_array = [random.randint(1, 100) for _ in range(array_size)]
 
-        # Sortieralgorithmus mit Schritt-Tracking
-        def bubble_sort_steps(arr):
-            arr = arr.copy()
-            n = len(arr)
-            steps = [arr.copy()]
-            for i in range(n):
-                swapped = False
-                for j in range(n - i - 1):
-                    if arr[j] > arr[j + 1]:
-                        arr[j], arr[j + 1] = arr[j + 1], arr[j]
-                        swapped = True
-                        steps.append(arr.copy())
-                if not swapped:
-                    break
-            return steps
+    if "sort_array" not in st.session_state:
+        st.session_state.sort_array = [random.randint(1, 100) for _ in range(array_size)]
 
-        def quick_sort_steps(arr):
-            arr = arr.copy()
-            steps = [arr.copy()]
+    arr = st.session_state.sort_array.copy()
 
-            def _qs(a, lo, hi):
-                if lo < hi:
-                    pivot = a[(lo + hi) // 2]
-                    i, j = lo, hi
-                    while i <= j:
-                        while a[i] < pivot:
-                            i += 1
-                        while a[j] > pivot:
-                            j -= 1
-                        if i <= j:
-                            a[i], a[j] = a[j], a[i]
-                            steps.append(a.copy())
-                            i += 1
-                            j -= 1
-                    _qs(a, lo, j)
-                    _qs(a, i, hi)
+    # ── Visualisierung ───────────────────────────────────────
+    import matplotlib.pyplot as plt
 
-            _qs(arr, 0, len(arr) - 1)
-            return steps
-
-        def merge_sort_steps(arr):
-            arr = arr.copy()
-            steps = [arr.copy()]
-
-            def _ms(a, lo, hi):
-                if lo < hi:
-                    mid = (lo + hi) // 2
-                    _ms(a, lo, mid)
-                    _ms(a, mid + 1, hi)
-                    # Merge
-                    left = a[lo:mid + 1]
-                    right = a[mid + 1:hi + 1]
-                    i = j = 0
-                    k = lo
-                    while i < len(left) and j < len(right):
-                        if left[i] <= right[j]:
-                            a[k] = left[i]
-                            i += 1
-                        else:
-                            a[k] = right[j]
-                            j += 1
-                        k += 1
-                        steps.append(a.copy())
-                    while i < len(left):
-                        a[k] = left[i]
-                        i += 1
-                        k += 1
-                        steps.append(a.copy())
-                    while j < len(right):
-                        a[k] = right[j]
-                        j += 1
-                        k += 1
-                        steps.append(a.copy())
-
-            _ms(arr, 0, len(arr) - 1)
-            return steps
-
-        # Schritte berechnen
-        if algo == "Bubble Sort":
-            steps = bubble_sort_steps(arr)
-        elif algo == "Quick Sort":
-            steps = quick_sort_steps(arr)
-        else:
-            steps = merge_sort_steps(arr)
-
-        st.markdown(f"**{len(steps)} Schritte** | Algorithmus: **{algo}** | O-Komplexität: **{'O(n²)' if algo == 'Bubble Sort' else 'O(n log n)'}**")
-
-        # Animation
-        chart_placeholder = st.empty()
-        progress_bar = st.progress(0)
-
-        if st.session_state.sort_running:
-            for i, step_arr in enumerate(steps):
-                fig, ax = plt.subplots(figsize=(10, 4))
-                colors = ['#4ECDC4'] * len(step_arr)
-                # Letzte i Elemente sind sortiert (bei Bubble)
-                if algo == "Bubble Sort":
-                    for k in range(len(step_arr) - i % (len(step_arr) + 1), len(step_arr)):
-                        if k >= 0:
-                            colors[k] = '#FF6B6B'
-                bars = ax.bar(range(len(step_arr)), step_arr, color=colors, edgecolor='white')
-                ax.set_ylim(0, max(arr) * 1.1)
-                ax.set_xlabel("Index")
-                ax.set_ylabel("Wert")
-                ax.set_title(f"{algo} — Schritt {i + 1}/{len(steps)}")
-                chart_placeholder.pyplot(fig)
-                plt.close(fig)
-                progress_bar.progress((i + 1) / len(steps))
-                time.sleep(geschwindigkeit / 1000)
-
-            st.success(f"✅ Sortierung abgeschlossen! {len(steps)} Schritte.")
-
-        # Vergleich der Algorithmen
-        st.markdown("---")
-        st.subheader("📈 Algorithmen-Vergleich")
-
-        if st.button("⏱️ Laufzeit messen", use_container_width=True):
-            import timeit
-
-            test_arr = rng.randint(1, 1000, 200).tolist()
-
-            t_bubble = timeit.timeit(lambda: bubble_sort(test_arr), number=10) / 10
-            t_quick = timeit.timeit(lambda: quick_sort(test_arr), number=100) / 100
-            t_merge = timeit.timeit(lambda: merge_sort(test_arr), number=100) / 100
-
-            fig, ax = plt.subplots(figsize=(8, 4))
-            algos = ['Bubble Sort\nO(n²)', 'Quick Sort\nO(n log n)', 'Merge Sort\nO(n log n)']
-            times = [t_bubble * 1000, t_quick * 1000, t_merge * 1000]
-            colors = ['#FF6B6B', '#4ECDC4', '#45B7D1']
-            ax.bar(algos, times, color=colors, edgecolor='white')
-            ax.set_ylabel("Zeit (ms)")
-            ax.set_title("Laufzeitvergleich (200 Elemente)")
-            for i, v in enumerate(times):
-                ax.text(i, v + 0.1, f"{v:.2f} ms", ha='center')
-            st.pyplot(fig)
-            plt.close(fig)
-
-# ═══════════════════════════════════════════════════════════════
-# SUCHALGORITHMEN
-# ═══════════════════════════════════════════════════════════════
-elif kategorie == "Suchalgorithmen":
-    st.header("🔍 Suchalgorithmen vergleichen")
-
-    col1, col2 = st.columns([1, 2])
-
-    with col1:
-        array_size = st.slider("Array-Größe", 10, 100, 30)
-        target = st.number_input("Zielwert suchen", 1, 100, 50)
-        search_type = st.radio("Suchverfahren", ["Lineare Suche", "Binäre Suche"])
-
-    with col2:
-        # Sortiertes Array
-        arr = sorted(np.random.RandomState(42).randint(1, 100, array_size).tolist())
-
-        st.markdown(f"**Sortiertes Array** ({array_size} Elemente):")
-        st.code(str(arr))
-
-        if search_type == "Lineare Suche":
-            st.markdown("### 🔄 Lineare Suche — O(n)")
-            steps = 0
-            found_idx = -1
-            for i, val in enumerate(arr):
-                steps += 1
-                if val == target:
-                    found_idx = i
-                    break
-
-            if found_idx >= 0:
-                st.success(f"✅ Gefunden an Index **{found_idx}** nach **{steps}** Schritten")
-            else:
-                st.warning(f"❌ Nicht gefunden nach **{steps}** Schritten")
-        else:
-            st.markdown("### 🎯 Binäre Suche — O(log n)")
-            result = binary_search(arr, target)
-            max_steps = int(np.ceil(np.log2(len(arr))))
-            if result >= 0:
-                st.success(f"✅ Gefunden an Index **{result}** (max. {max_steps} Schritte)")
-            else:
-                st.warning(f"❌ Nicht gefunden (max. {max_steps} Schritte)")
-
-        # Visualisierung
+    def plot_array(arr_data, title, highlight=None, color_map=None):
         fig, ax = plt.subplots(figsize=(10, 4))
-        colors = ['#4ECDC4'] * len(arr)
-        if search_type == "Binäre Suche" and result >= 0:
-            colors[result] = '#FF6B6B'
-        elif search_type == "Lineare Suche":
-            for i in range(steps):
-                if i < len(arr):
-                    colors[i] = '#FFE66D'
-            if found_idx >= 0:
-                colors[found_idx] = '#FF6B6B'
-
-        ax.bar(range(len(arr)), arr, color=colors, edgecolor='white')
-        ax.axhline(y=target, color='red', linestyle='--', label=f'Ziel: {target}')
+        colors = ["#2196F3"] * len(arr_data)
+        if highlight is not None:
+            for idx in highlight:
+                if 0 <= idx < len(colors):
+                    colors[idx] = "#FF5722"
+        if color_map:
+            for idx, c in color_map.items():
+                if 0 <= idx < len(colors):
+                    colors[idx] = c
+        bars = ax.bar(range(len(arr_data)), arr_data, color=colors)
+        ax.set_title(title)
         ax.set_xlabel("Index")
         ax.set_ylabel("Wert")
-        ax.legend()
+        ax.set_ylim(0, max(arr_data) * 1.1 if arr_data else 10)
+        return fig
+
+    # ── Bubble Sort ──────────────────────────────────────────
+    def bubble_sort_animate(arr):
+        arr = arr.copy()
+        n = len(arr)
+        steps = []
+        for i in range(n):
+            swapped = False
+            for j in range(n - i - 1):
+                steps.append(("compare", arr.copy(), [j, j+1]))
+                if arr[j] > arr[j + 1]:
+                    arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                    swapped = True
+                    steps.append(("swap", arr.copy(), [j, j+1]))
+            if not swapped:
+                break
+        steps.append(("done", arr.copy(), list(range(n))))
+        return steps
+
+    # ── Quick Sort ───────────────────────────────────────────
+    def quick_sort_animate(arr):
+        arr = arr.copy()
+        steps = []
+
+        def _qs(a, lo, hi):
+            if lo >= hi:
+                return
+            pivot = a[(lo + hi) // 2]
+            steps.append(("pivot", a.copy(), [(lo + hi) // 2]))
+            i, j = lo, hi
+            while i <= j:
+                while a[i] < pivot:
+                    i += 1
+                while a[j] > pivot:
+                    j -= 1
+                if i <= j:
+                    a[i], a[j] = a[j], a[i]
+                    steps.append(("swap", a.copy(), [i, j]))
+                    i += 1
+                    j -= 1
+            _qs(a, lo, j)
+            _qs(a, i, hi)
+
+        _qs(arr, 0, len(arr) - 1)
+        steps.append(("done", arr.copy(), list(range(len(arr)))))
+        return steps
+
+    # ── Merge Sort ───────────────────────────────────────────
+    def merge_sort_animate(arr):
+        arr = arr.copy()
+        steps = []
+
+        def _ms(a, lo, hi):
+            if hi - lo <= 1:
+                return a[lo:hi]
+            mid = (lo + hi) // 2
+            steps.append(("divide", a.copy(), list(range(lo, hi))))
+            left = _ms(a, lo, mid)
+            right = _ms(a, mid, hi)
+            # Merge
+            result = []
+            i = j = 0
+            while i < len(left) and j < len(right):
+                if left[i] <= right[j]:
+                    result.append(left[i])
+                    i += 1
+                else:
+                    result.append(right[j])
+                    j += 1
+            result.extend(left[i:])
+            result.extend(right[j:])
+            a[lo:hi] = result
+            steps.append(("merge", a.copy(), list(range(lo, hi))))
+            return result
+
+        _ms(arr, 0, len(arr))
+        steps.append(("done", arr.copy(), list(range(len(arr)))))
+        return steps
+
+    # ── Ausführung ───────────────────────────────────────────
+    if algorithm == "Bubble Sort":
+        if st.button("▶️ Bubble Sort starten", type="primary"):
+            steps = bubble_sort_animate(arr)
+            plot_placeholder = st.empty()
+            status = st.empty()
+
+            for i, (action, state, highlight) in enumerate(steps):
+                title = f"Bubble Sort — Schritt {i+1}/{len(steps)}: {action}"
+                fig = plot_array(state, title, highlight)
+                plot_placeholder.pyplot(fig)
+                status.text(f"Vergleiche: {sum(1 for s in steps[:i+1] if s[0]=='compare')} | Swaps: {sum(1 for s in steps[:i+1] if s[0]=='swap')}")
+                time.sleep(speed / 1000)
+                import matplotlib.pyplot as plt_module
+                plt_module.close(fig)
+
+            status.text(f"✅ Bubble Sort abgeschlossen! Vergleiche: {sum(1 for s in steps if s[0]=='compare')} | Swaps: {sum(1 for s in steps if s[0]=='swap')}")
+
+    elif algorithm == "Quick Sort":
+        if st.button("▶️ Quick Sort starten", type="primary"):
+            steps = quick_sort_animate(arr)
+            plot_placeholder = st.empty()
+            status = st.empty()
+
+            for i, (action, state, highlight) in enumerate(steps):
+                title = f"Quick Sort — Schritt {i+1}/{len(steps)}: {action}"
+                fig = plot_array(state, title, highlight)
+                plot_placeholder.pyplot(fig)
+                status.text(f"Schritt {i+1}/{len(steps)} — {action}")
+                time.sleep(speed / 1000)
+                import matplotlib.pyplot as plt_module
+                plt_module.close(fig)
+
+            status.text(f"✅ Quick Sort abgeschlossen!")
+
+    elif algorithm == "Merge Sort":
+        if st.button("▶️ Merge Sort starten", type="primary"):
+            steps = merge_sort_animate(arr)
+            plot_placeholder = st.empty()
+            status = st.empty()
+
+            for i, (action, state, highlight) in enumerate(steps):
+                title = f"Merge Sort — Schritt {i+1}/{len(steps)}: {action}"
+                fig = plot_array(state, title, highlight)
+                plot_placeholder.pyplot(fig)
+                status.text(f"Schritt {i+1}/{len(steps)} — {action}")
+                time.sleep(speed / 1000)
+                import matplotlib.pyplot as plt_module
+                plt_module.close(fig)
+
+            status.text(f"✅ Merge Sort abgeschlossen!")
+
+    elif algorithm == "Alle drei vergleichen":
+        if st.button("▶️ Alle drei vergleichen", type="primary"):
+            col1, col2, col3 = st.columns(3)
+
+            # Bubble
+            with col1:
+                st.subheader("🫧 Bubble Sort")
+                steps = bubble_sort_animate(arr)
+                fig = plot_array(steps[-1][1], "Bubble Sort — Fertig", list(range(len(arr))))
+                st.pyplot(fig)
+                compares = sum(1 for s in steps if s[0] == 'compare')
+                swaps = sum(1 for s in steps if s[0] == 'swap')
+                st.metric("Vergleiche", compares)
+                st.metric("Swaps", swaps)
+                st.metric("Schritte", len(steps))
+
+            # Quick
+            with col2:
+                st.subheader("⚡ Quick Sort")
+                steps = quick_sort_animate(arr)
+                fig = plot_array(steps[-1][1], "Quick Sort — Fertig", list(range(len(arr))))
+                st.pyplot(fig)
+                swaps = sum(1 for s in steps if s[0] == 'swap')
+                st.metric("Swaps", swaps)
+                st.metric("Schritte", len(steps))
+
+            # Merge
+            with col3:
+                st.subheader("🔀 Merge Sort")
+                steps = merge_sort_animate(arr)
+                fig = plot_array(steps[-1][1], "Merge Sort — Fertig", list(range(len(arr))))
+                st.pyplot(fig)
+                merges = sum(1 for s in steps if s[0] == 'merge')
+                st.metric("Merges", merges)
+                st.metric("Schritte", len(steps))
+
+            st.info("💡 **Bubble Sort** (O(n²)): Einfach, viele Vergleiche. **Quick Sort** (O(n log n)): Schnell, Divide & Conquer. **Merge Sort** (O(n log n)): Stabil, gut für verkettete Listen.")
+
+# ═══════════════════════════════════════════════════════════════
+# 2. Suchalgorithmen vergleichen
+# ═══════════════════════════════════════════════════════════════
+
+elif mode == "Suchalgorithmen vergleichen":
+    st.header("🔍 Suchalgorithmen vergleichen")
+
+    st.markdown("Vergleiche **Lineare Suche** (O(n)) mit **Binärer Suche** (O(log n)).")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        search_size = st.slider("Array-Größe", 10, 1000, 100, 10)
+    with col2:
+        target = st.number_input("Zielwert", 0, 999, 42)
+
+    if st.button("🔍 Suchen & Vergleichen", type="primary"):
+        # Sortiertes Array
+        arr = sorted([random.randint(0, 999) for _ in range(search_size)])
+
+        # ── Lineare Suche ────────────────────────────────────
+        linear_steps = 0
+        linear_found = -1
+        for i, val in enumerate(arr):
+            linear_steps += 1
+            if val == target:
+                linear_found = i
+                break
+
+        # ── Binäre Suche ─────────────────────────────────────
+        binary_steps = 0
+        binary_found = -1
+        lo, hi = 0, len(arr) - 1
+        while lo <= hi:
+            binary_steps += 1
+            mid = (lo + hi) // 2
+            if arr[mid] == target:
+                binary_found = mid
+                break
+            elif arr[mid] < target:
+                lo = mid + 1
+            else:
+                hi = mid - 1
+
+        # ── Ergebnisse ───────────────────────────────────────
+        st.divider()
+        st.subheader("📊 Ergebnisse")
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("### 🔍 Lineare Suche")
+            st.metric("Schritte", linear_steps)
+            st.metric("Gefunden bei Index", linear_found if linear_found >= 0 else "Nicht gefunden")
+            st.caption(f"Komplexität: O(n) = O({search_size})")
+
+        with col2:
+            st.markdown("### ⚡ Binäre Suche")
+            st.metric("Schritte", binary_steps)
+            st.metric("Gefunden bei Index", binary_found if binary_found >= 0 else "Nicht gefunden")
+            st.caption(f"Komplexität: O(log n) = O({int(np.log2(search_size))})")
+
+        # ── Visualisierung ───────────────────────────────────
+        st.subheader("📈 Vergleich")
+        import matplotlib.pyplot as plt
+
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+        # Array mit Markierung
+        colors = ["#E0E0E0"] * len(arr)
+        if linear_found >= 0:
+            colors[linear_found] = "#4CAF50"
+        # Zeige nur einen Ausschnitt
+        window = min(50, len(arr))
+        start_idx = max(0, (linear_found if linear_found >= 0 else 0) - window // 2)
+        end_idx = min(len(arr), start_idx + window)
+        ax1.bar(range(start_idx, end_idx), arr[start_idx:end_idx],
+                color=colors[start_idx:end_idx])
+        ax1.set_title(f"Lineare Suche: {linear_steps} Schritte")
+        ax1.set_xlabel("Index")
+        ax1.set_ylabel("Wert")
+
+        # Komplexitäts-Vergleich
+        sizes = [10, 50, 100, 500, 1000]
+        linear_ops = sizes
+        binary_ops = [int(np.log2(s)) for s in sizes]
+        ax2.plot(sizes, linear_ops, "o-", label="Linear O(n)", color="#FF5722")
+        ax2.plot(sizes, binary_ops, "s-", label="Binär O(log n)", color="#4CAF50")
+        ax2.set_title("Komplexitäts-Vergleich")
+        ax2.set_xlabel("Array-Größe (n)")
+        ax2.set_ylabel("Max. Schritte")
+        ax2.legend()
+        ax2.grid(True, alpha=0.3)
+
         st.pyplot(fig)
-        plt.close(fig)
 
-    # Komplexitätsvergleich
-    st.markdown("---")
-    st.subheader("📊 Komplexitätsvergleich")
-
-    sizes = [10, 50, 100, 500, 1000]
-    linear_steps = sizes
-    binary_steps = [int(np.ceil(np.log2(s))) for s in sizes]
-
-    fig, ax = plt.subplots(figsize=(8, 4))
-    ax.plot(sizes, linear_steps, 'o-', color='#FF6B6B', label='Lineare Suche O(n)')
-    ax.plot(sizes, binary_steps, 's-', color='#4ECDC4', label='Binäre Suche O(log n)')
-    ax.set_xlabel("Array-Größe (n)")
-    ax.set_ylabel("Maximale Schritte")
-    ax.set_title("Suchkomplexität im Vergleich")
-    ax.legend()
-    ax.grid(True, alpha=0.3)
-    st.pyplot(fig)
-    plt.close(fig)
+        st.success(f"⚡ Binäre Suche ist **{linear_steps // max(binary_steps, 1)}× schneller** bei n={search_size}!")
 
 # ═══════════════════════════════════════════════════════════════
-# GRAPHEN
+# 3. Graphen visualisieren
 # ═══════════════════════════════════════════════════════════════
-elif kategorie == "Graphen":
+
+elif mode == "Graphen visualisieren":
     st.header("🕸️ Graphen visualisieren")
 
-    col1, col2 = st.columns([1, 2])
+    graph_algo = st.selectbox(
+        "Algorithmus",
+        ["BFS (Breitensuche)", "DFS (Tiefensuche)", "Dijkstra (Kürzeste Pfade)", "Alle drei"],
+    )
 
-    with col1:
-        graph_preset = st.selectbox(
-            "Graph wählen",
-            ["Standard-Graph (ungerichtet)", "Gewichteter Graph (Dijkstra)", "Eigener Graph"],
-        )
-
-        algo_choice = st.radio(
-            "Algorithmus",
-            ["BFS (Breitensuche)", "DFS (Tiefensuche)", "Dijkstra (kürzeste Pfade)"],
-        )
-
-        if graph_preset == "Standard-Graph (ungerichtet)":
-            graph = {
+    # Vordefinierte Graphen
+    graph_presets = {
+        "Einfach (6 Knoten)": {
+            "graph": {
                 "A": ["B", "C"],
                 "B": ["A", "D", "E"],
                 "C": ["A", "F"],
                 "D": ["B"],
                 "E": ["B", "F"],
                 "F": ["C", "E"],
-            }
-            start_node = st.selectbox("Startknoten", list(graph.keys()), index=0)
-        elif graph_preset == "Gewichteter Graph (Dijkstra)":
-            graph = {
+            },
+            "weighted": {
                 "A": {"B": 4, "C": 2},
                 "B": {"A": 4, "C": 1, "D": 5},
                 "C": {"A": 2, "B": 1, "D": 8, "E": 10},
                 "D": {"B": 5, "C": 8, "E": 2},
                 "E": {"C": 10, "D": 2},
-            }
-            start_node = st.selectbox("Startknoten", list(graph.keys()), index=0)
-        else:
-            st.info("Definiere deinen eigenen Graphen im Code.")
+            },
+            "start": "A",
+        },
+        "Mittel (8 Knoten)": {
+            "graph": {
+                "A": ["B", "C", "D"],
+                "B": ["A", "E", "F"],
+                "C": ["A", "G"],
+                "D": ["A", "H"],
+                "E": ["B"],
+                "F": ["B", "G"],
+                "G": ["C", "F", "H"],
+                "H": ["D", "G"],
+            },
+            "weighted": {
+                "A": {"B": 2, "C": 5, "D": 1},
+                "B": {"A": 2, "E": 3, "F": 4},
+                "C": {"A": 5, "G": 2},
+                "D": {"A": 1, "H": 6},
+                "E": {"B": 3},
+                "F": {"B": 4, "G": 1},
+                "G": {"C": 2, "F": 1, "H": 3},
+                "H": {"D": 6, "G": 3},
+            },
+            "start": "A",
+        },
+    }
 
-    with col2:
-        # Graph visualisieren mit NetworkX-ähnlichem Layout
-        def draw_graph(graph, highlight_nodes=None, highlight_edges=None, title="Graph"):
-            if highlight_nodes is None:
-                highlight_nodes = []
-            if highlight_edges is None:
-                highlight_edges = []
+    preset = st.selectbox("Graph auswählen", list(graph_presets.keys()))
+    gdata = graph_presets[preset]
+    graph = gdata["graph"]
+    weighted = gdata["weighted"]
+    start_node = st.selectbox("Startknoten", list(graph.keys()), index=list(graph.keys()).index(gdata["start"]))
 
-            # Einfaches Kreis-Layout
-            nodes = list(graph.keys())
-            n = len(nodes)
-            angles = np.linspace(0, 2 * np.pi, n, endpoint=False)
-            pos = {node: (np.cos(a), np.sin(a)) for node, a in zip(nodes, angles)}
+    if st.button("▶️ Ausführen", type="primary"):
+        # ── BFS ──────────────────────────────────────────────
+        def bfs(graph, start):
+            visited = {start}
+            queue = deque([start])
+            order = []
+            while queue:
+                node = queue.popleft()
+                order.append(node)
+                for neighbor in graph.get(node, []):
+                    if neighbor not in visited:
+                        visited.add(neighbor)
+                        queue.append(neighbor)
+            return order
 
-            fig, ax = plt.subplots(figsize=(8, 8))
+        # ── DFS ──────────────────────────────────────────────
+        def dfs(graph, start):
+            visited = set()
+            order = []
+            def _dfs(node):
+                visited.add(node)
+                order.append(node)
+                for neighbor in graph.get(node, []):
+                    if neighbor not in visited:
+                        _dfs(neighbor)
+            _dfs(start)
+            return order
 
-            # Kanten zeichnen
-            drawn_edges = set()
-            for node, neighbors in graph.items():
-                if isinstance(neighbors, dict):  # Gewichtet
-                    for neighbor, weight in neighbors.items():
-                        edge_key = tuple(sorted([node, neighbor]))
-                        if edge_key in drawn_edges:
-                            continue
-                        drawn_edges.add(edge_key)
-                        x1, y1 = pos[node]
-                        x2, y2 = pos[neighbor]
-                        color = '#FF6B6B' if (node, neighbor) in highlight_edges or (neighbor, node) in highlight_edges else '#888888'
-                        ax.plot([x1, x2], [y1, y2], '-', color=color, linewidth=2, alpha=0.6)
-                        mx, my = (x1 + x2) / 2, (y1 + y2) / 2
-                        ax.text(mx, my, str(weight), fontsize=9, ha='center', va='center',
-                                bbox=dict(boxstyle='round,pad=0.2', facecolor='white', alpha=0.8))
-                else:  # Ungerichtet
-                    for neighbor in neighbors:
-                        edge_key = tuple(sorted([node, neighbor]))
-                        if edge_key in drawn_edges:
-                            continue
-                        drawn_edges.add(edge_key)
-                        x1, y1 = pos[node]
-                        x2, y2 = pos[neighbor]
-                        color = '#FF6B6B' if (node, neighbor) in highlight_edges or (neighbor, node) in highlight_edges else '#888888'
-                        ax.plot([x1, x2], [y1, y2], '-', color=color, linewidth=2, alpha=0.6)
+        # ── Dijkstra ─────────────────────────────────────────
+        def dijkstra(graph, start):
+            dist = {node: float("inf") for node in graph}
+            dist[start] = 0
+            pq = [(0, start)]
+            while pq:
+                d, node = heapq.heappop(pq)
+                if d > dist[node]:
+                    continue
+                for neighbor, weight in graph[node].items():
+                    new_dist = d + weight
+                    if new_dist < dist[neighbor]:
+                        dist[neighbor] = new_dist
+                        heapq.heappush(pq, (new_dist, neighbor))
+            return dist
 
-            # Knoten zeichnen
-            for node, (x, y) in pos.items():
-                color = '#FF6B6B' if node in highlight_nodes else '#4ECDC4'
-                ax.scatter(x, y, s=800, color=color, edgecolors='white', linewidth=2, zorder=5)
-                ax.text(x, y, node, fontsize=14, ha='center', va='center', fontweight='bold', color='white')
+        # ── Graph-Visualisierung ─────────────────────────────
+        import matplotlib.pyplot as plt
+        import networkx as nx
 
-            ax.set_xlim(-1.5, 1.5)
-            ax.set_ylim(-1.5, 1.5)
-            ax.set_aspect('equal')
-            ax.axis('off')
-            ax.set_title(title, fontsize=14)
+        def draw_graph(graph, title, highlight_order=None, distances=None):
+            G = nx.Graph(graph)
+            pos = nx.spring_layout(G, seed=42, k=1.5)
+
+            fig, ax = plt.subplots(figsize=(8, 6))
+            nx.draw_networkx_edges(G, pos, ax=ax, edge_color="#BDBDBD", width=1.5)
+
+            if highlight_order:
+                colors = []
+                for node in G.nodes():
+                    if node in highlight_order:
+                        idx = highlight_order.index(node)
+                        colors.append(plt.cm.Blues(0.3 + 0.7 * idx / max(len(highlight_order)-1, 1)))
+                    else:
+                        colors.append("#E0E0E0")
+                nx.draw_networkx_nodes(G, pos, ax=ax, node_color=colors, node_size=600)
+                # Nummerierung
+                labels = {node: f"{node}\n({highlight_order.index(node)+1})" for node in highlight_order}
+            elif distances:
+                colors = []
+                for node in G.nodes():
+                    d = distances.get(node, float("inf"))
+                    if d == float("inf"):
+                        colors.append("#E0E0E0")
+                    else:
+                        max_d = max(v for v in distances.values() if v != float("inf"))
+                        colors.append(plt.cm.Greens(0.3 + 0.7 * (1 - d / max(max_d, 1))))
+                nx.draw_networkx_nodes(G, pos, ax=ax, node_color=colors, node_size=600)
+                labels = {node: f"{node}\n({distances.get(node, '∞')})" for node in G.nodes()}
+            else:
+                nx.draw_networkx_nodes(G, pos, ax=ax, node_color="#2196F3", node_size=600)
+                labels = {node: node for node in G.nodes()}
+
+            nx.draw_networkx_labels(G, pos, ax=ax, labels=labels, font_size=10)
+            ax.set_title(title)
+            ax.axis("off")
             return fig
 
-        if graph_preset == "Standard-Graph (ungerichtet)":
-            if algo_choice == "BFS (Breitensuche)":
-                result = bfs(graph, start_node)
-                st.markdown(f"**BFS ab '{start_node}'**: `{' → '.join(result)}`")
-                fig = draw_graph(graph, highlight_nodes=result, title=f"BFS ab {start_node}")
-                st.pyplot(fig)
-                plt.close(fig)
-
-            elif algo_choice == "DFS (Tiefensuche)":
-                result = dfs(graph, start_node)
-                st.markdown(f"**DFS ab '{start_node}'**: `{' → '.join(result)}`")
-                fig = draw_graph(graph, highlight_nodes=result, title=f"DFS ab {start_node}")
-                st.pyplot(fig)
-                plt.close(fig)
-            else:
-                st.warning("Dijkstra benötigt einen gewichteten Graphen. Bitte wähle den gewichteten Graphen.")
-
-        elif graph_preset == "Gewichteter Graph (Dijkstra)":
-            if algo_choice == "Dijkstra (kürzeste Pfade)":
-                result = dijkstra(graph, start_node)
-                st.markdown(f"**Dijkstra ab '{start_node}'**:")
-                for node, dist in sorted(result.items()):
-                    st.markdown(f"- `{start_node} → {node}`: **{dist:.0f}**")
-                fig = draw_graph(graph, highlight_nodes=list(result.keys()), title=f"Dijkstra ab {start_node}")
-                st.pyplot(fig)
-                plt.close(fig)
-            else:
-                st.info("BFS/DFS funktionieren auch auf gewichteten Graphen (Gewichte werden ignoriert).")
-                unweighted = {k: list(v.keys()) for k, v in graph.items()}
-                if algo_choice == "BFS (Breitensuche)":
-                    result = bfs(unweighted, start_node)
-                else:
-                    result = dfs(unweighted, start_node)
-                st.markdown(f"**{algo_choice} ab '{start_node}'**: `{' → '.join(result)}`")
-                fig = draw_graph(graph, highlight_nodes=result, title=f"{algo_choice} ab {start_node}")
-                st.pyplot(fig)
-                plt.close(fig)
-
-# ═══════════════════════════════════════════════════════════════
-# DYNAMISCHE PROGRAMMIERUNG
-# ═══════════════════════════════════════════════════════════════
-elif kategorie == "Dynamische Programmierung":
-    st.header("🧩 Dynamische Programmierung")
-
-    tab1, tab2, tab3 = st.tabs(["Fibonacci", "Rucksackproblem", "LCS"])
-
-    with tab1:
-        st.subheader("🐇 Fibonacci — DP vs. Rekursiv")
-
-        n = st.slider("n (Fibonacci-Zahl)", 0, 50, 10, key="fib_n")
-
-        col_a, col_b = st.columns(2)
-        with col_a:
-            t0 = time.time()
-            result = fibonacci(n)
-            t_dp = (time.time() - t0) * 1000
-            st.metric("DP O(n)", f"F({n}) = {result}", f"{t_dp:.3f} ms")
-
-        with col_b:
-            # Rekursive Berechnung (nur für kleine n)
-            if n <= 30:
-                def fib_rec(n):
-                    if n <= 1:
-                        return n
-                    return fib_rec(n - 1) + fib_rec(n - 2)
-
-                t0 = time.time()
-                result_rec = fib_rec(n)
-                t_rec = (time.time() - t0) * 1000
-                st.metric("Rekursiv O(2ⁿ)", f"F({n}) = {result_rec}", f"{t_rec:.1f} ms")
-            else:
-                st.warning("⚠️ Rekursive Berechnung für n > 30 zu langsam")
-
-        # Fibonacci-Werte visualisieren
-        values = [fibonacci(i) for i in range(min(n + 1, 20))]
-        fig, ax = plt.subplots(figsize=(8, 3))
-        ax.bar(range(len(values)), values, color='#4ECDC4', edgecolor='white')
-        ax.set_xlabel("n")
-        ax.set_ylabel("F(n)")
-        ax.set_title("Fibonacci-Zahlen")
-        st.pyplot(fig)
-        plt.close(fig)
-
-    with tab2:
-        st.subheader("🎒 0/1 Rucksackproblem")
-
-        col1, col2 = st.columns(2)
-        with col1:
-            capacity = st.slider("Kapazität", 10, 100, 50, key="knap_cap")
-            num_items = st.slider("Anzahl Gegenstände", 3, 8, 4, key="knap_items")
-
-        # Zufällige Gegenstände
-        rng = np.random.RandomState(42)
-        values = rng.randint(10, 100, num_items).tolist()
-        weights = rng.randint(5, 30, num_items).tolist()
-
-        with col2:
-            st.markdown("**Gegenstände:**")
-            for i, (v, w) in enumerate(zip(values, weights)):
-                st.markdown(f"- Item {i + 1}: Wert **{v}**, Gewicht **{w}** (Ratio: {v / w:.1f})")
-
-        result = knapsack(values, weights, capacity)
-        st.success(f"💰 Maximaler Wert bei Kapazität {capacity}: **{result}**")
-
-        # Visualisierung
-        fig, ax = plt.subplots(figsize=(8, 4))
-        x = np.arange(num_items)
-        width = 0.35
-        ax.bar(x - width / 2, values, width, label='Wert', color='#4ECDC4', edgecolor='white')
-        ax.bar(x + width / 2, weights, width, label='Gewicht', color='#FF6B6B', edgecolor='white')
-        ax.set_xlabel("Gegenstand")
-        ax.set_ylabel("Wert / Gewicht")
-        ax.set_title("Rucksackproblem — Gegenstände")
-        ax.set_xticks(x)
-        ax.set_xticklabels([f"Item {i + 1}" for i in range(num_items)])
-        ax.legend()
-        st.pyplot(fig)
-        plt.close(fig)
-
-    with tab3:
-        st.subheader("📝 Longest Common Subsequence (LCS)")
-
-        col1, col2 = st.columns(2)
-        with col1:
-            str_a = st.text_input("String A", "ABCDGH")
-        with col2:
-            str_b = st.text_input("String B", "AEDFHR")
-
-        if str_a and str_b:
-            result = longest_common_subsequence(str_a, str_b)
-            st.metric("LCS-Länge", result)
-
-            # DP-Tabelle visualisieren
-            m, n = len(str_a), len(str_b)
-            dp = [[0] * (n + 1) for _ in range(m + 1)]
-            for i in range(1, m + 1):
-                for j in range(1, n + 1):
-                    if str_a[i - 1] == str_b[j - 1]:
-                        dp[i][j] = dp[i - 1][j - 1] + 1
-                    else:
-                        dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
-
-            fig, ax = plt.subplots(figsize=(max(6, n + 1), max(4, m + 1)))
-            im = ax.imshow(dp, cmap='YlOrRd', aspect='auto')
-            ax.set_xticks(range(n + 1))
-            ax.set_xticklabels([''] + list(str_b))
-            ax.set_yticks(range(m + 1))
-            ax.set_yticklabels([''] + list(str_a))
-            ax.set_xlabel("String B")
-            ax.set_ylabel("String A")
-            ax.set_title(f"DP-Tabelle — LCS = {result}")
-            for i in range(m + 1):
-                for j in range(n + 1):
-                    ax.text(j, i, dp[i][j], ha='center', va='center', fontsize=10)
-            plt.colorbar(im, ax=ax)
+        if graph_algo == "BFS (Breitensuche)":
+            order = bfs(graph, start_node)
+            st.subheader(f"🔍 BFS ab '{start_node}'")
+            st.write(f"**Reihenfolge**: {' → '.join(order)}")
+            fig = draw_graph(graph, f"BFS ab {start_node}", highlight_order=order)
             st.pyplot(fig)
-            plt.close(fig)
+            st.info(f"💡 BFS besucht Knoten ebenenweise. Reihenfolge: {len(order)} Knoten in {len(order)-1} Schritten.")
+
+        elif graph_algo == "DFS (Tiefensuche)":
+            order = dfs(graph, start_node)
+            st.subheader(f"🔍 DFS ab '{start_node}'")
+            st.write(f"**Reihenfolge**: {' → '.join(order)}")
+            fig = draw_graph(graph, f"DFS ab {start_node}", highlight_order=order)
+            st.pyplot(fig)
+            st.info(f"💡 DFS geht zuerst in die Tiefe. Reihenfolge: {len(order)} Knoten.")
+
+        elif graph_algo == "Dijkstra (Kürzeste Pfade)":
+            dist = dijkstra(weighted, start_node)
+            st.subheader(f"📏 Dijkstra ab '{start_node}'")
+            st.write("**Kürzeste Distanzen:**")
+            for node, d in sorted(dist.items()):
+                st.write(f"- {start_node} → {node}: **{d}**")
+            fig = draw_graph(graph, f"Dijkstra ab {start_node}", distances=dist)
+            st.pyplot(fig)
+            st.info(f"💡 Dijkstra findet kürzeste Pfade in gewichteten Graphen (nur positive Kantengewichte).")
+
+        elif graph_algo == "Alle drei":
+            col1, col2, col3 = st.columns(3)
+
+            with col1:
+                st.subheader("🔍 BFS")
+                order = bfs(graph, start_node)
+                st.write(f"**Reihenfolge**: {' → '.join(order)}")
+                fig = draw_graph(graph, "BFS", highlight_order=order)
+                st.pyplot(fig)
+
+            with col2:
+                st.subheader("🔍 DFS")
+                order = dfs(graph, start_node)
+                st.write(f"**Reihenfolge**: {' → '.join(order)}")
+                fig = draw_graph(graph, "DFS", highlight_order=order)
+                st.pyplot(fig)
+
+            with col3:
+                st.subheader("📏 Dijkstra")
+                dist = dijkstra(weighted, start_node)
+                for node, d in sorted(dist.items()):
+                    st.write(f"{start_node}→{node}: **{d}**")
+                fig = draw_graph(graph, "Dijkstra", distances=dist)
+                st.pyplot(fig)
+
+# ═══════════════════════════════════════════════════════════════
+# Sidebar: Info
+# ═══════════════════════════════════════════════════════════════
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("📁 **Repo:** [algorithmen](https://github.com/mark-baumann/algorithmen)")
-st.sidebar.markdown("🐍 **Python 3.13** · **Streamlit** · **Matplotlib**")
+st.sidebar.subheader("ℹ️ Algorithmen-Übersicht")
+st.sidebar.markdown("""
+**Sortieren:**
+- 🫧 Bubble Sort — O(n²)
+- ⚡ Quick Sort — O(n log n)
+- 🔀 Merge Sort — O(n log n)
+
+**Suchen:**
+- 🔍 Linear — O(n)
+- ⚡ Binär — O(log n)
+
+**Graphen:**
+- 🔍 BFS — O(V + E)
+- 🔍 DFS — O(V + E)
+- 📏 Dijkstra — O((V+E) log V)
+
+**DP:**
+- Fibonacci — O(n)
+- Knapsack — O(n·W)
+- LCS — O(n·m)
+""")
+
+st.sidebar.markdown("---")
+st.sidebar.caption("Algorithmen · Streamlit App")
