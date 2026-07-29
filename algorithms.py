@@ -6,6 +6,7 @@ implementiert zum Verstehen, nicht zum Produktiv-Einsatz.
 """
 
 from typing import List, TypeVar, Optional
+from collections import deque
 import heapq
 
 T = TypeVar("T")
@@ -91,10 +92,10 @@ def binary_search(arr: List[T], target: T) -> int:
 def bfs(graph: dict, start: T) -> List[T]:
     """Breitensuche — kürzester Pfad in ungewichtetem Graphen."""
     visited = {start}
-    queue = [start]
+    queue = deque([start])
     order = []
     while queue:
-        node = queue.pop(0)
+        node = queue.popleft()
         order.append(node)
         for neighbor in graph.get(node, []):
             if neighbor not in visited:
