@@ -4,13 +4,19 @@ Ausführen mit: pytest test_algorithms.py -v
 """
 
 import pytest
-from algorithms import (
-    bubble_sort, quick_sort, merge_sort,
-    binary_search,
-    bfs, dfs, dijkstra,
-    fibonacci, knapsack, longest_common_subsequence,
-)
 
+from algorithms import (
+    bfs,
+    binary_search,
+    bubble_sort,
+    dfs,
+    dijkstra,
+    fibonacci,
+    knapsack,
+    longest_common_subsequence,
+    merge_sort,
+    quick_sort,
+)
 
 # ═══════════════════════════════════════════════════════════════
 # Sortieralgorithmen

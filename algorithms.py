@@ -5,9 +5,9 @@ Sortieren, Suchen, Graphen, Dynamische Programmierung —
 implementiert zum Verstehen, nicht zum Produktiv-Einsatz.
 """
 
-from typing import List, TypeVar, Optional, Dict
-from collections import deque
 import heapq
+from collections import deque
+from typing import TypeVar
 
 T = TypeVar("T")
 
@@ -16,7 +16,7 @@ T = TypeVar("T")
 # Sortieralgorithmen
 # ═══════════════════════════════════════════════════════════════
 
-def bubble_sort(arr: List[T]) -> List[T]:
+def bubble_sort(arr: list[T]) -> list[T]:
     """O(n²) — einfach, aber langsam. Gut zum Lernen."""
     arr = arr.copy()
     n = len(arr)
@@ -31,7 +31,7 @@ def bubble_sort(arr: List[T]) -> List[T]:
     return arr
 
 
-def quick_sort(arr: List[T]) -> List[T]:
+def quick_sort(arr: list[T]) -> list[T]:
     """O(n log n) average — Divide & Conquer."""
     if len(arr) <= 1:
         return arr
@@ -42,7 +42,7 @@ def quick_sort(arr: List[T]) -> List[T]:
     return quick_sort(left) + middle + quick_sort(right)
 
 
-def merge_sort(arr: List[T]) -> List[T]:
+def merge_sort(arr: list[T]) -> list[T]:
     """O(n log n) — stabil, gut für Linked Lists."""
     if len(arr) <= 1:
         return arr
@@ -52,7 +52,7 @@ def merge_sort(arr: List[T]) -> List[T]:
     return _merge(left, right)
 
 
-def _merge(left: List[T], right: List[T]) -> List[T]:
+def _merge(left: list[T], right: list[T]) -> list[T]:
     result = []
     i = j = 0
     while i < len(left) and j < len(right):
@@ -71,7 +71,7 @@ def _merge(left: List[T], right: List[T]) -> List[T]:
 # Suchalgorithmen
 # ═══════════════════════════════════════════════════════════════
 
-def binary_search(arr: List[T], target: T) -> int:
+def binary_search(arr: list[T], target: T) -> int:
     """O(log n) — Voraussetzung: sortiertes Array."""
     lo, hi = 0, len(arr) - 1
     while lo <= hi:
@@ -89,7 +89,7 @@ def binary_search(arr: List[T], target: T) -> int:
 # Graphenalgorithmen
 # ═══════════════════════════════════════════════════════════════
 
-def bfs(graph: Dict[T, List[T]], start: T) -> List[T]:
+def bfs(graph: dict[T, list[T]], start: T) -> list[T]:
     """Breitensuche — kürzester Pfad in ungewichtetem Graphen."""
     visited = {start}
     queue = deque([start])
@@ -104,7 +104,7 @@ def bfs(graph: Dict[T, List[T]], start: T) -> List[T]:
     return order
 
 
-def dfs(graph: Dict[T, List[T]], start: T, visited: Optional[set] = None) -> List[T]:
+def dfs(graph: dict[T, list[T]], start: T, visited: set | None = None) -> list[T]:
     """Tiefensuche — rekursiv."""
     if visited is None:
         visited = set()
@@ -148,7 +148,7 @@ def fibonacci(n: int) -> int:
     return dp[n]
 
 
-def knapsack(values: List[int], weights: List[int], capacity: int) -> int:
+def knapsack(values: list[int], weights: list[int], capacity: int) -> int:
     """0/1 Rucksackproblem — DP-Lösung O(n*W)."""
     n = len(values)
     dp = [[0] * (capacity + 1) for _ in range(n + 1)]

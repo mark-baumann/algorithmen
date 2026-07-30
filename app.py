@@ -4,13 +4,13 @@ Streamlit-App: Algorithmen
 Sortieralgorithmen animieren, Suchalgorithmen vergleichen, Graphen visualisieren.
 """
 
-import streamlit as st
-import numpy as np
-import time
-import random
-from collections import deque
 import heapq
-from typing import List, Dict, Tuple
+import random
+import time
+from collections import deque
+
+import numpy as np
+import streamlit as st
 
 # ── Page Config ──────────────────────────────────────────────
 st.set_page_config(
@@ -67,7 +67,7 @@ if mode == "Sortieralgorithmen animieren":
             for idx, c in color_map.items():
                 if 0 <= idx < len(colors):
                     colors[idx] = c
-        bars = ax.bar(range(len(arr_data)), arr_data, color=colors)
+        ax.bar(range(len(arr_data)), arr_data, color=colors)
         ax.set_title(title)
         ax.set_xlabel("Index")
         ax.set_ylabel("Wert")
@@ -185,7 +185,7 @@ if mode == "Sortieralgorithmen animieren":
                 import matplotlib.pyplot as plt_module
                 plt_module.close(fig)
 
-            status.text(f"✅ Quick Sort abgeschlossen!")
+            status.text("✅ Quick Sort abgeschlossen!")
 
     elif algorithm == "Merge Sort":
         if st.button("▶️ Merge Sort starten", type="primary"):
@@ -202,45 +202,44 @@ if mode == "Sortieralgorithmen animieren":
                 import matplotlib.pyplot as plt_module
                 plt_module.close(fig)
 
-            status.text(f"✅ Merge Sort abgeschlossen!")
+            status.text("✅ Merge Sort abgeschlossen!")
 
-    elif algorithm == "Alle drei vergleichen":
-        if st.button("▶️ Alle drei vergleichen", type="primary"):
-            col1, col2, col3 = st.columns(3)
+    elif algorithm == "Alle drei vergleichen" and st.button("▶️ Alle drei vergleichen", type="primary"):
+        col1, col2, col3 = st.columns(3)
 
-            # Bubble
-            with col1:
-                st.subheader("🫧 Bubble Sort")
-                steps = bubble_sort_animate(arr)
-                fig = plot_array(steps[-1][1], "Bubble Sort — Fertig", list(range(len(arr))))
-                st.pyplot(fig)
-                compares = sum(1 for s in steps if s[0] == 'compare')
-                swaps = sum(1 for s in steps if s[0] == 'swap')
-                st.metric("Vergleiche", compares)
-                st.metric("Swaps", swaps)
-                st.metric("Schritte", len(steps))
+        # Bubble
+        with col1:
+            st.subheader("🫧 Bubble Sort")
+            steps = bubble_sort_animate(arr)
+            fig = plot_array(steps[-1][1], "Bubble Sort — Fertig", list(range(len(arr))))
+            st.pyplot(fig)
+            compares = sum(1 for s in steps if s[0] == 'compare')
+            swaps = sum(1 for s in steps if s[0] == 'swap')
+            st.metric("Vergleiche", compares)
+            st.metric("Swaps", swaps)
+            st.metric("Schritte", len(steps))
 
-            # Quick
-            with col2:
-                st.subheader("⚡ Quick Sort")
-                steps = quick_sort_animate(arr)
-                fig = plot_array(steps[-1][1], "Quick Sort — Fertig", list(range(len(arr))))
-                st.pyplot(fig)
-                swaps = sum(1 for s in steps if s[0] == 'swap')
-                st.metric("Swaps", swaps)
-                st.metric("Schritte", len(steps))
+        # Quick
+        with col2:
+            st.subheader("⚡ Quick Sort")
+            steps = quick_sort_animate(arr)
+            fig = plot_array(steps[-1][1], "Quick Sort — Fertig", list(range(len(arr))))
+            st.pyplot(fig)
+            swaps = sum(1 for s in steps if s[0] == 'swap')
+            st.metric("Swaps", swaps)
+            st.metric("Schritte", len(steps))
 
-            # Merge
-            with col3:
-                st.subheader("🔀 Merge Sort")
-                steps = merge_sort_animate(arr)
-                fig = plot_array(steps[-1][1], "Merge Sort — Fertig", list(range(len(arr))))
-                st.pyplot(fig)
-                merges = sum(1 for s in steps if s[0] == 'merge')
-                st.metric("Merges", merges)
-                st.metric("Schritte", len(steps))
+        # Merge
+        with col3:
+            st.subheader("🔀 Merge Sort")
+            steps = merge_sort_animate(arr)
+            fig = plot_array(steps[-1][1], "Merge Sort — Fertig", list(range(len(arr))))
+            st.pyplot(fig)
+            merges = sum(1 for s in steps if s[0] == 'merge')
+            st.metric("Merges", merges)
+            st.metric("Schritte", len(steps))
 
-            st.info("💡 **Bubble Sort** (O(n²)): Einfach, viele Vergleiche. **Quick Sort** (O(n log n)): Schnell, Divide & Conquer. **Merge Sort** (O(n log n)): Stabil, gut für verkettete Listen.")
+        st.info("💡 **Bubble Sort** (O(n²)): Einfach, viele Vergleiche. **Quick Sort** (O(n log n)): Schnell, Divide & Conquer. **Merge Sort** (O(n log n)): Stabil, gut für verkettete Listen.")
 
 # ═══════════════════════════════════════════════════════════════
 # 2. Suchalgorithmen vergleichen
@@ -314,7 +313,7 @@ elif mode == "Suchalgorithmen vergleichen":
             colors[linear_found] = "#4CAF50"
         # Zeige nur einen Ausschnitt
         window = min(50, len(arr))
-        start_idx = max(0, (linear_found if linear_found >= 0 else 0) - window // 2)
+        start_idx = max(0, (max(linear_found, 0)) - window // 2)
         end_idx = min(len(arr), start_idx + window)
         ax1.bar(range(start_idx, end_idx), arr[start_idx:end_idx],
                 color=colors[start_idx:end_idx])
@@ -511,7 +510,7 @@ elif mode == "Graphen visualisieren":
                 st.write(f"- {start_node} → {node}: **{d}**")
             fig = draw_graph(graph, f"Dijkstra ab {start_node}", distances=dist)
             st.pyplot(fig)
-            st.info(f"💡 Dijkstra findet kürzeste Pfade in gewichteten Graphen (nur positive Kantengewichte).")
+            st.info("💡 Dijkstra findet kürzeste Pfade in gewichteten Graphen (nur positive Kantengewichte).")
 
         elif graph_algo == "Alle drei":
             col1, col2, col3 = st.columns(3)
