@@ -30,3 +30,6 @@ Thumbs.db
 .pytest_cache/
 htmlcov/
 .coverage
+wandb_runs/
+checkpoints/
+*.jsonl
