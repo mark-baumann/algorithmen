@@ -58,6 +58,106 @@ def dijkstra(graph, start):
                 heapq.heappush(pq, (new_dist, neighbor))
     return dist
 
+
+def binary_search(arr, target):
+    """Binäre Suche — O(log n)."""
+    left, right = 0, len(arr) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    return -1
+
+
+def bubble_sort(arr):
+    """Bubble Sort — O(n^2)."""
+    arr = arr.copy()
+    n = len(arr)
+    for i in range(n):
+        swapped = False
+        for j in range(n - i - 1):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                swapped = True
+        if not swapped:
+            break
+    return arr
+
+
+def quick_sort(arr):
+    """Quick Sort — O(n log n) average."""
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    return quick_sort(left) + middle + quick_sort(right)
+
+
+def merge_sort(arr):
+    """Merge Sort — O(n log n), stabil."""
+    if len(arr) <= 1:
+        return arr
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    result = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+    result.extend(left[i:])
+    result.extend(right[j:])
+    return result
+
+
+def fibonacci(n):
+    """Fibonacci — dynamische Programmierung, O(n)."""
+    if n < 0:
+        return -1
+    if n <= 1:
+        return n
+    a, b = 0, 1
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    return b
+
+
+def knapsack(values, weights, capacity):
+    """0/1 Rucksackproblem — dynamische Programmierung."""
+    n = len(values)
+    dp = [[0] * (capacity + 1) for _ in range(n + 1)]
+    for i in range(1, n + 1):
+        for w in range(capacity + 1):
+            if weights[i - 1] <= w:
+                dp[i][w] = max(dp[i - 1][w], dp[i - 1][w - weights[i - 1]] + values[i - 1])
+            else:
+                dp[i][w] = dp[i - 1][w]
+    return dp[n][capacity]
+
+
+def longest_common_subsequence(s1, s2):
+    """Längste gemeinsame Teilsequenz — dynamische Programmierung."""
+    m, n = len(s1), len(s2)
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if s1[i - 1] == s2[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + 1
+            else:
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+    return dp[m][n]
+
+
 # ── Page Config ──────────────────────────────────────────────
 st.set_page_config(
     page_title="Algorithmen Visualisierung",

@@ -5,7 +5,7 @@ Ausführen mit: pytest test_algorithms.py -v
 
 import pytest
 
-from algorithms import (
+from app.app import (
     bfs,
     binary_search,
     bubble_sort,
