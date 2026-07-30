@@ -12,8 +12,8 @@ Interaktive Visualisierung **klassischer Algorithmen** — Sortieralgorithmen an
 - **🔍 Suchalgorithmen vergleichen** — Lineare Suche vs. Binäre Suche mit Komplexitätsvergleich
 - **🕸️ Graphen visualisieren** — BFS, DFS und Dijkstra auf interaktiven Graphen mit farbiger Knotenmarkierung
 - **📊 Komplexitätsanalyse** — O(n²) vs. O(n log n) live erleben
-- **⚡ Performance-Vergleich** — Alle drei Sortieralgorithmen nebeneinander mit Metriken
-- **✅ Getestet** — Unit-Tests für alle Algorithmen
+- **⚡ Performance-Vergleich** — Alle Sortieralgorithmen nebeneinander mit Metriken
+- **📓 Lern-Notebooks** — Sortier-, Such- und Graphenalgorithmen mit Erklärungen in `notebooks/`
 
 ## 🚀 Installation
 
@@ -28,23 +28,24 @@ source .venv/bin/activate  # Linux/macOS
 # .venv\Scripts\activate   # Windows
 
 # Abhängigkeiten installieren
-uv pip install numpy matplotlib networkx streamlit pytest
+uv pip install numpy matplotlib networkx streamlit
 ```
 
 ## 🎯 Nutzung
 
 ```bash
 # Streamlit-App starten
-streamlit run app.py
+streamlit run app/app.py
 ```
 
 Die App öffnet sich im Browser unter `http://localhost:8501`. Wähle einen Modus aus der Seitenleiste: Sortieren, Suchen oder Graphen.
 
-## 🧪 Tests ausführen
+## 📓 Notebooks
 
-```bash
-pytest test_algorithms.py -v
-```
+Die Notebooks in `notebooks/` erklären die Algorithmen Schritt für Schritt und lassen sich lokal (Jupyter) oder in Google Colab öffnen:
+
+- `sortieralgorithmen.ipynb` — Bubble Sort, Quick Sort, Merge Sort, Heap Sort, Binary Search
+- `graphenalgorithmen.ipynb` — BFS, DFS, Dijkstra
 
 ## 🛠️ Tech-Stack
 
@@ -55,15 +56,16 @@ pytest test_algorithms.py -v
 | **Matplotlib** | Balkendiagramme für Sortieranimationen |
 | **NetworkX** | Graph-Layout und -Visualisierung |
 | **Streamlit** | Interaktive Web-App |
-| **Pytest** | Test-Framework |
 
 ## 📁 Projektstruktur
 
 ```
 algorithmen/
-├── app.py                  # Streamlit-Hauptapp (3 Modi)
-├── algorithms.py           # Alle Algorithmen-Implementierungen
-└── test_algorithms.py      # Unit-Tests
+├── app/
+│   └── app.py                         # Streamlit-Hauptapp (3 Modi)
+└── notebooks/
+    ├── sortieralgorithmen.ipynb       # Sortier- & Suchalgorithmen
+    └── graphenalgorithmen.ipynb       # BFS, DFS, Dijkstra
 ```
 
 ## 📖 Enthaltene Algorithmen
@@ -74,6 +76,7 @@ algorithmen/
 | **Bubble Sort** | O(n²) | O(n²) | ✅ |
 | **Quick Sort** | O(n log n) | O(n²) | ❌ |
 | **Merge Sort** | O(n log n) | O(n log n) | ✅ |
+| **Heap Sort** | O(n log n) | O(n log n) | ❌ |
 
 ### Suchen
 | Algorithmus | Komplexität | Voraussetzung |
