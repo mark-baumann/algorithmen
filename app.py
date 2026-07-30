@@ -4,13 +4,15 @@ Streamlit-App: Algorithmen
 Sortieralgorithmen animieren, Suchalgorithmen vergleichen, Graphen visualisieren.
 """
 
-import heapq
 import random
 import time
-from collections import deque
 
+import matplotlib.pyplot as plt
+import networkx as nx
 import numpy as np
 import streamlit as st
+
+from algorithms import bfs, dfs, dijkstra
 
 # ── Page Config ──────────────────────────────────────────────
 st.set_page_config(
@@ -54,7 +56,6 @@ if mode == "Sortieralgorithmen animieren":
     arr = st.session_state.sort_array.copy()
 
     # ── Visualisierung ───────────────────────────────────────
-    import matplotlib.pyplot as plt
 
     def plot_array(arr_data, title, highlight=None, color_map=None):
         fig, ax = plt.subplots(figsize=(10, 4))
@@ -165,8 +166,7 @@ if mode == "Sortieralgorithmen animieren":
                 plot_placeholder.pyplot(fig)
                 status.text(f"Vergleiche: {sum(1 for s in steps[:i+1] if s[0]=='compare')} | Swaps: {sum(1 for s in steps[:i+1] if s[0]=='swap')}")
                 time.sleep(speed / 1000)
-                import matplotlib.pyplot as plt_module
-                plt_module.close(fig)
+                plt.close(fig)
 
             status.text(f"✅ Bubble Sort abgeschlossen! Vergleiche: {sum(1 for s in steps if s[0]=='compare')} | Swaps: {sum(1 for s in steps if s[0]=='swap')}")
 
@@ -182,8 +182,7 @@ if mode == "Sortieralgorithmen animieren":
                 plot_placeholder.pyplot(fig)
                 status.text(f"Schritt {i+1}/{len(steps)} — {action}")
                 time.sleep(speed / 1000)
-                import matplotlib.pyplot as plt_module
-                plt_module.close(fig)
+                plt.close(fig)
 
             status.text("✅ Quick Sort abgeschlossen!")
 
@@ -199,8 +198,7 @@ if mode == "Sortieralgorithmen animieren":
                 plot_placeholder.pyplot(fig)
                 status.text(f"Schritt {i+1}/{len(steps)} — {action}")
                 time.sleep(speed / 1000)
-                import matplotlib.pyplot as plt_module
-                plt_module.close(fig)
+                plt.close(fig)
 
             status.text("✅ Merge Sort abgeschlossen!")
 
@@ -303,7 +301,6 @@ elif mode == "Suchalgorithmen vergleichen":
 
         # ── Visualisierung ───────────────────────────────────
         st.subheader("📈 Vergleich")
-        import matplotlib.pyplot as plt
 
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
 
@@ -401,52 +398,7 @@ elif mode == "Graphen visualisieren":
     start_node = st.selectbox("Startknoten", list(graph.keys()), index=list(graph.keys()).index(gdata["start"]))
 
     if st.button("▶️ Ausführen", type="primary"):
-        # ── BFS ──────────────────────────────────────────────
-        def bfs(graph, start):
-            visited = {start}
-            queue = deque([start])
-            order = []
-            while queue:
-                node = queue.popleft()
-                order.append(node)
-                for neighbor in graph.get(node, []):
-                    if neighbor not in visited:
-                        visited.add(neighbor)
-                        queue.append(neighbor)
-            return order
-
-        # ── DFS ──────────────────────────────────────────────
-        def dfs(graph, start):
-            visited = set()
-            order = []
-            def _dfs(node):
-                visited.add(node)
-                order.append(node)
-                for neighbor in graph.get(node, []):
-                    if neighbor not in visited:
-                        _dfs(neighbor)
-            _dfs(start)
-            return order
-
-        # ── Dijkstra ─────────────────────────────────────────
-        def dijkstra(graph, start):
-            dist = {node: float("inf") for node in graph}
-            dist[start] = 0
-            pq = [(0, start)]
-            while pq:
-                d, node = heapq.heappop(pq)
-                if d > dist[node]:
-                    continue
-                for neighbor, weight in graph[node].items():
-                    new_dist = d + weight
-                    if new_dist < dist[neighbor]:
-                        dist[neighbor] = new_dist
-                        heapq.heappush(pq, (new_dist, neighbor))
-            return dist
-
         # ── Graph-Visualisierung ─────────────────────────────
-        import matplotlib.pyplot as plt
-        import networkx as nx
 
         def draw_graph(graph, title, highlight_order=None, distances=None):
             G = nx.Graph(graph)
