@@ -4,15 +4,59 @@ Streamlit-App: Algorithmen
 Sortieralgorithmen animieren, Suchalgorithmen vergleichen, Graphen visualisieren.
 """
 
+import heapq
 import random
 import time
+from collections import deque
 
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import streamlit as st
 
-from algorithms import bfs, dfs, dijkstra
+
+def bfs(graph, start):
+    """Breitensuche — kürzester Pfad in ungewichtetem Graphen."""
+    visited = {start}
+    queue = deque([start])
+    order = []
+    while queue:
+        node = queue.popleft()
+        order.append(node)
+        for neighbor in graph.get(node, []):
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+    return order
+
+
+def dfs(graph, start, visited=None):
+    """Tiefensuche — rekursiv."""
+    if visited is None:
+        visited = set()
+    visited.add(start)
+    order = [start]
+    for neighbor in graph.get(start, []):
+        if neighbor not in visited:
+            order.extend(dfs(graph, neighbor, visited))
+    return order
+
+
+def dijkstra(graph, start):
+    """Dijkstra — kürzeste Pfade in gewichtetem Graphen."""
+    dist = {node: float("inf") for node in graph}
+    dist[start] = 0
+    pq = [(0, start)]
+    while pq:
+        d, node = heapq.heappop(pq)
+        if d > dist[node]:
+            continue
+        for neighbor, weight in graph.get(node, {}).items():
+            new_dist = d + weight
+            if new_dist < dist[neighbor]:
+                dist[neighbor] = new_dist
+                heapq.heappush(pq, (new_dist, neighbor))
+    return dist
 
 # ── Page Config ──────────────────────────────────────────────
 st.set_page_config(
