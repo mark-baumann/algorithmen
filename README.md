@@ -1,71 +1,48 @@
-# 📊 Algorithmen Visualisierung
+# 📊 Algorithmen — Google Colab Notebooks
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B.svg)](https://streamlit.io/)
-[![Status](https://img.shields.io/badge/Status-Aktiv-brightgreen.svg)]()
+[![Colab](https://img.shields.io/badge/Google%20Colab-Open%20in%20Colab-F9AB00.svg)](https://colab.research.google.com/)
 
-Interaktive Visualisierung **klassischer Algorithmen** — Sortieralgorithmen animieren, Suchalgorithmen vergleichen und Graphenalgorithmen (BFS, DFS, Dijkstra) auf echten Graphen ausführen. Alle Algorithmen sind in reinem Python implementiert und werden Schritt für Schritt in der Streamlit-App dargestellt.
+Interaktive **Jupyter Notebooks** zu klassischen Algorithmen — Sortier-, Such- und Graphenalgorithmen (BFS, DFS, Dijkstra) mit Erklärungen und Schritt-für-Schritt-Code. Alle Algorithmen sind in reinem Python implementiert und direkt in **Google Colab** ausführbar.
 
 ## ✨ Features
 
-- **🔄 Sortieralgorithmen animieren** — Bubble Sort, Quick Sort und Merge Sort mit Schritt-für-Schritt-Animation
-- **🔍 Suchalgorithmen vergleichen** — Lineare Suche vs. Binäre Suche mit Komplexitätsvergleich
-- **🕸️ Graphen visualisieren** — BFS, DFS und Dijkstra auf interaktiven Graphen mit farbiger Knotenmarkierung
+- **🔄 Sortieralgorithmen** — Bubble Sort, Quick Sort, Merge Sort und Heap Sort mit Laufzeitvergleich
+- **🔍 Suchalgorithmen** — Lineare Suche vs. Binäre Suche mit Komplexitätsvergleich
+- **🕸️ Graphenalgorithmen** — BFS, DFS und Dijkstra mit Erklärungen
 - **📊 Komplexitätsanalyse** — O(n²) vs. O(n log n) live erleben
-- **⚡ Performance-Vergleich** — Alle Sortieralgorithmen nebeneinander mit Metriken
-- **📓 Lern-Notebooks** — Sortier-, Such- und Graphenalgorithmen mit Erklärungen in `notebooks/`
+- **📓 Lern-Notebooks** — Sortier-, Such- und Graphenalgorithmen mit Erklärungen
 
-## 🚀 Installation
+## 🚀 In Google Colab öffnen
+
+Jedes Notebook lässt sich direkt in Google Colab öffnen und ausführen:
+
+| Notebook | Inhalt | Colab |
+|----------|--------|-------|
+| `sortieralgorithmen.ipynb` | Bubble Sort, Quick Sort, Merge Sort, Heap Sort, Binary Search | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mark-baumann/algorithmen/blob/main/sortieralgorithmen.ipynb) |
+| `graphenalgorithmen.ipynb` | BFS, DFS, Dijkstra | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mark-baumann/algorithmen/blob/main/graphenalgorithmen.ipynb) |
+| `Djkstra.ipynb` | Dijkstra (Kurzreferenz) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mark-baumann/algorithmen/blob/main/Djkstra.ipynb) |
+
+> 💡 **Tipp:** In Colab: Datei → In Drive speichern → mit GPU/TPU ausführen.
+
+## 🛠️ Lokal ausführen (optional)
 
 ```bash
-# Repository klonen
 git clone https://github.com/mark-baumann/algorithmen.git
 cd algorithmen
-
-# Virtuelle Umgebung erstellen
 uv venv
-source .venv/bin/activate  # Linux/macOS
-# .venv\Scripts\activate   # Windows
-
-# Abhängigkeiten installieren
-uv pip install numpy matplotlib networkx streamlit
+source .venv/bin/activate
+uv pip install jupyter numpy matplotlib
+jupyter notebook
 ```
-
-## 🎯 Nutzung
-
-```bash
-# Streamlit-App starten
-streamlit run app/app.py
-```
-
-Die App öffnet sich im Browser unter `http://localhost:8501`. Wähle einen Modus aus der Seitenleiste: Sortieren, Suchen oder Graphen.
-
-## 📓 Notebooks
-
-Die Notebooks in `notebooks/` erklären die Algorithmen Schritt für Schritt und lassen sich lokal (Jupyter) oder in Google Colab öffnen:
-
-- `sortieralgorithmen.ipynb` — Bubble Sort, Quick Sort, Merge Sort, Heap Sort, Binary Search
-- `graphenalgorithmen.ipynb` — BFS, DFS, Dijkstra
-
-## 🛠️ Tech-Stack
-
-| Technologie | Einsatz |
-|-------------|---------|
-| **Python** | Alle Algorithmen in reinem Python implementiert |
-| **NumPy** | Numerische Hilfsfunktionen |
-| **Matplotlib** | Balkendiagramme für Sortieranimationen |
-| **NetworkX** | Graph-Layout und -Visualisierung |
-| **Streamlit** | Interaktive Web-App |
 
 ## 📁 Projektstruktur
 
 ```
 algorithmen/
-├── app/
-│   └── app.py                         # Streamlit-Hauptapp (3 Modi)
-└── notebooks/
-    ├── sortieralgorithmen.ipynb       # Sortier- & Suchalgorithmen
-    └── graphenalgorithmen.ipynb       # BFS, DFS, Dijkstra
+├── sortieralgorithmen.ipynb       # Sortier- & Suchalgorithmen
+├── graphenalgorithmen.ipynb       # BFS, DFS, Dijkstra
+└── Djkstra.ipynb                  # Dijkstra (Kurzreferenz)
 ```
 
 ## 📖 Enthaltene Algorithmen
@@ -97,4 +74,4 @@ algorithmen/
 
 ---
 
-*Algorithmen sind das Handwerkszeug jedes Entwicklers. Diese App macht abstrakte Konzepte durch Animation und interaktive Visualisierung greifbar.*
+*Algorithmen sind das Handwerkszeug jedes Entwicklers. Diese Notebooks machen abstrakte Konzepte durch Code und Erklärungen greifbar.*

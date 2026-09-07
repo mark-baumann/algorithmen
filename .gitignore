@@ -35,3 +35,6 @@ checkpoints/
 *.jsonl
 .venv
 *.pyc
+
+# Claude local
+.claude/
