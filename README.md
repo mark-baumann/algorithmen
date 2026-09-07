@@ -1,9 +1,9 @@
-# 📊 Algorithmen — Google Colab Notebooks
+# 📊 Algorithmen — Google Colab Notebook
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Colab](https://img.shields.io/badge/Google%20Colab-Open%20in%20Colab-F9AB00.svg)](https://colab.research.google.com/)
 
-Interaktive **Jupyter Notebooks** zu klassischen Algorithmen — Sortier-, Such- und Graphenalgorithmen (BFS, DFS, Dijkstra) mit Erklärungen und Schritt-für-Schritt-Code. Alle Algorithmen sind in reinem Python implementiert und direkt in **Google Colab** ausführbar.
+Ein einziges interaktives **Jupyter Notebook** zu klassischen Algorithmen — Sortier-, Such- und Graphenalgorithmen (BFS, DFS, Dijkstra) mit Erklärungen und Schritt-für-Schritt-Code. Alle Algorithmen sind in reinem Python implementiert und direkt in **Google Colab** ausführbar.
 
 ## ✨ Features
 
@@ -11,19 +11,17 @@ Interaktive **Jupyter Notebooks** zu klassischen Algorithmen — Sortier-, Such-
 - **🔍 Suchalgorithmen** — Lineare Suche vs. Binäre Suche mit Komplexitätsvergleich
 - **🕸️ Graphenalgorithmen** — BFS, DFS und Dijkstra mit Erklärungen
 - **📊 Komplexitätsanalyse** — O(n²) vs. O(n log n) live erleben
-- **📓 Lern-Notebooks** — Sortier-, Such- und Graphenalgorithmen mit Erklärungen
+- **📓 Ein Lern-Notebook** — alles an einem Ort, von oben nach unten ausführbar
 
 ## 🚀 In Google Colab öffnen
 
-Jedes Notebook lässt sich direkt in Google Colab öffnen und ausführen:
+Das Notebook lässt sich direkt in Google Colab öffnen und ausführen:
 
 | Notebook | Inhalt | Colab |
 |----------|--------|-------|
-| `sortieralgorithmen.ipynb` | Bubble Sort, Quick Sort, Merge Sort, Heap Sort, Binary Search | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mark-baumann/algorithmen/blob/main/sortieralgorithmen.ipynb) |
-| `graphenalgorithmen.ipynb` | BFS, DFS, Dijkstra | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mark-baumann/algorithmen/blob/main/graphenalgorithmen.ipynb) |
-| `Djkstra.ipynb` | Dijkstra (Kurzreferenz) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mark-baumann/algorithmen/blob/main/Djkstra.ipynb) |
+| `algorithmen.ipynb` | Sortieren, Suchen, Graphen (BFS, DFS, Dijkstra) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mark-baumann/algorithmen/blob/main/algorithmen.ipynb) |
 
-> 💡 **Tipp:** In Colab: Datei → In Drive speichern → mit GPU/TPU ausführen.
+> 💡 **Tipp:** In Colab: Datei → In Drive speichern → mit GPU/TPU ausführen. Alle Zellen von oben nach unten ausführen (Runtime → Run all).
 
 ## 🛠️ Lokal ausführen (optional)
 
@@ -40,9 +38,7 @@ jupyter notebook
 
 ```
 algorithmen/
-├── sortieralgorithmen.ipynb       # Sortier- & Suchalgorithmen
-├── graphenalgorithmen.ipynb       # BFS, DFS, Dijkstra
-└── Djkstra.ipynb                  # Dijkstra (Kurzreferenz)
+└── algorithmen.ipynb   # Sortier-, Such- & Graphenalgorithmen
 ```
 
 ## 📖 Enthaltene Algorithmen
@@ -74,4 +70,4 @@ algorithmen/
 
 ---
 
-*Algorithmen sind das Handwerkszeug jedes Entwicklers. Diese Notebooks machen abstrakte Konzepte durch Code und Erklärungen greifbar.*
+*Algorithmen sind das Handwerkszeug jedes Entwicklers. Dieses Notebook macht abstrakte Konzepte durch Code und Erklärungen greifbar.*
